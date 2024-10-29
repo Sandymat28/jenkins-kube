@@ -36,6 +36,37 @@ pipeline{
         sh 'docker push matsandy/example-kube:latest'
       }
     }
+
+    stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    // Charger le fichier kubeconfig pour l'accès au cluster Kubernetes
+                    withKubeConfig([credentialsId: KUBERNETES_CREDENTIALS]) {
+                        // Déployer l'application dans le cluster Kubernetes
+                        sh """
+                        kubectl set image deployment/techstore-deployment techstore-container=${DOCKER_IMAGE}:${DOCKER_TAG} --record
+                        kubectl rollout status deployment/techstore-deployment
+                        """
+                    }
+                }
+            }
+
+    /*stage("SSH Into k8s Server") {
+        def remote = [:]
+        remote.name = 'K8S master'
+        remote.host = '192.168.1.186'
+        remote.user = 'msandy'
+        remote.password = 'msandy'
+        remote.allowAnyHosts = true
+
+        stage('Put k8s-spring-boot-deployment.yml onto k8smaster') {
+            sshPut remote: remote, from: 'k8s-spring-boot-deployment.yml', into: '.'
+        }
+
+        stage('Deploy spring boot') {
+            sshCommand remote: remote, command: "kubectl apply -f k8s-spring-boot-deployment.yml"
+
+        }*/
   }
 
     post{
