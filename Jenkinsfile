@@ -9,7 +9,7 @@ pipeline{
     stage('Compilation'){
       steps{
         echo 'Build application'
-        sh './gradlew build'
+        sh './gradlew clean build'
       }
     }
 
