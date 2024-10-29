@@ -3,6 +3,8 @@ pipeline{
 
   environment{
     DOCKERHUB_CREDENTIALS=credentials('DOCKER_ACCOUNT')
+    DOCKER_IMAGE = 'matsandy/example-kube:latest'
+    DOCKER_TAG = 'latest'
   }
 
   stages{
@@ -41,11 +43,11 @@ pipeline{
             steps {
                 script {
                     // Charger le fichier kubeconfig pour l'accès au cluster Kubernetes
-                    withKubeConfig([credentialsId: KUBERNETES_CREDENTIALS]) {
+                    withKubeConfig([credentialsId: k8s-master-ssh	]) {
                         // Déployer l'application dans le cluster Kubernetes
                         sh """
-                        kubectl set image deployment/techstore-deployment techstore-container=${DOCKER_IMAGE}:${DOCKER_TAG} --record
-                        kubectl rollout status deployment/techstore-deployment
+                        kubectl set image deployment/k8s-spring-boot-deployment example-kube-container=${DOCKER_IMAGE}:${DOCKER_TAG} --record
+                        kubectl rollout status deployment/k8s-spring-boot-deployment
                         """
                     }
                 }
