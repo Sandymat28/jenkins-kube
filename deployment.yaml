@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins-kube-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: jen-kube
+  template:
+    metadata:
+      labels:
+        app: jen-kube
+    spec:
+      containers:
+      - name: jen-kub
+        image: matsandy/example-kube:latest
+
+        ports:
+        - containerPort: 8087
