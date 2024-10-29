@@ -16,7 +16,7 @@ pipeline{
     stage('Docker image'){
       steps{
         echo 'Building docker images'
-        sh 'docker build -t matsandy/example-kube:latest'
+        sh 'docker build -t matsandy/example-kube:latest .'
         sh 'docker-compose build'
       }
     }
