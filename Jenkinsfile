@@ -40,18 +40,19 @@ pipeline{
     }
 
     stage('Deploy to Kubernetes') {
-            steps {
-                script {
+      steps {
+        script {
                     // Charger le fichier kubeconfig pour l'accès au cluster Kubernetes
-                    withKubeConfig([credentialsId: k8s-master-ssh	]) {
+            withKubeConfig([credentialsId: k8s-master-ssh	]) {
                         // Déployer l'application dans le cluster Kubernetes
-                        sh """
-                        kubectl set image deployment/k8s-spring-boot-deployment example-kube-container=${DOCKER_IMAGE}:${DOCKER_TAG} --record
-                        kubectl rollout status deployment/k8s-spring-boot-deployment
-                        """
+              sh """
+              kubectl set image deployment/k8s-spring-boot-deployment example-kube-container=${DOCKER_IMAGE}:${DOCKER_TAG} --record
+              kubectl rollout status deployment/k8s-spring-boot-deployment
+              """
                     }
                 }
             }
+    }
 
     /*stage("SSH Into k8s Server") {
         def remote = [:]
