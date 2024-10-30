@@ -44,7 +44,7 @@ pipeline{
         script {
           withKubeConfig([credentialsId: "mykubeconfig"]) {
             echo "Deploying applications to cluster"
-            sh 'kubectl apply -f k8s-spring-boot-deployemnt.yml'
+            sh 'kubectl apply -f k8s-spring-boot-deployment.yml'
             }
           }
         }
