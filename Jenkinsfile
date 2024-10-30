@@ -41,7 +41,9 @@ pipeline{
 
     stage('Deploy to Kubernetes') {
       steps {
-        script {
+        sh 'kubectl apply -f k8s-spring-boot-deployment.yml'
+        
+        /*script {
                     // Charger le fichier kubeconfig pour l'accès au cluster Kubernetes
             withKubeConfig([credentialsId: k8s-master-ssh	]) {
                         // Déployer l'application dans le cluster Kubernetes
@@ -50,7 +52,7 @@ pipeline{
               kubectl rollout status deployment/k8s-spring-boot-deployment
               """
                     }
-                }
+                }*/
             }
     }
 
@@ -70,6 +72,10 @@ pipeline{
             sshCommand remote: remote, command: "kubectl apply -f k8s-spring-boot-deployment.yml"
 
         }*/
+
+    /*withDockerRegistry(credentialsId: 'DOCKER_ACCOUNT') {
+    // some block
+}*/
     }
 
     post{
