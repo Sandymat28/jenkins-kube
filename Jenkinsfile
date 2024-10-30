@@ -40,70 +40,20 @@ pipeline{
     }
 
     stage('Deploy') {
-            steps {
-                script {
-                    //kubernetesDeploy(configs: "yamls/deploy.yaml", kubeconfigId: "minikube")
-                    withKubeConfig([credentialsId: "mykubeconfig"]) {
-                        echo "Deploying applications to cluster"
-                        sh 'kubectl apply -f k8s-spring-boot-'
-                    }
-                }
-            }
-        }
-
-    /*stage('Deploy to Kubernetes') {
       steps {
-        echo 'Deploying to Kubernetes'
-        sh 'kubectl apply -f k8s-spring-boot-deployment.yml'
-        
         script {
-                    // Charger le fichier kubeconfig pour l'accès au cluster Kubernetes
-            withKubeConfig([credentialsId: k8s-master-ssh	]) {
-                        // Déployer l'application dans le cluster Kubernetes
-              sh """
-              kubectl set image deployment/k8s-spring-boot-deployment example-kube-container=${DOCKER_IMAGE}:${DOCKER_TAG} --record
-              kubectl rollout status deployment/k8s-spring-boot-deployment
-              """
-                    }
-                }*/
+          withKubeConfig([credentialsId: "mykubeconfig"]) {
+            echo "Deploying applications to cluster"
+            sh 'kubectl apply -f k8s-spring-boot-deployemnt.yml'
             }
-    }
-
-    stage('Verify the deploying'){
-      steps{
-        sh 'kubectl get po'
-        sh 'kubectl get deployement'
-        sh 'kubectl get all'
-      }
-    }
-
-    /*stage("SSH Into k8s Server") {
-        def remote = [:]
-        remote.name = 'K8S master'
-        remote.host = '192.168.1.186'
-        remote.user = 'msandy'
-        remote.password = 'msandy'
-        remote.allowAnyHosts = true
-
-        stage('Put k8s-spring-boot-deployment.yml onto k8smaster') {
-            sshPut remote: remote, from: 'k8s-spring-boot-deployment.yml', into: '.'
+          }
         }
-
-        stage('Deploy spring boot') {
-            sshCommand remote: remote, command: "kubectl apply -f k8s-spring-boot-deployment.yml"
-
-        }*/
-
-    /*withDockerRegistry(credentialsId: 'DOCKER_ACCOUNT') {
-    // some block
-}*/
-    }
-
-    post{
+      }
+  }
+    
+post{
       always{
         sh 'docker logout'
       }
     }
 }
-
-      
