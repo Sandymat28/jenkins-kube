@@ -41,6 +41,7 @@ pipeline{
 
     stage('Deploy to Kubernetes') {
       steps {
+        echo 'Deploying to Kubernetes'
         sh 'kubectl apply -f k8s-spring-boot-deployment.yml'
         
         /*script {
@@ -54,6 +55,14 @@ pipeline{
                     }
                 }*/
             }
+    }
+
+    stage('Verify the deploying'){
+      steps{
+        sh 'kubectl get po'
+        sh 'kubectl get deployement'
+        sh 'kubectl get all'
+      }
     }
 
     /*stage("SSH Into k8s Server") {
