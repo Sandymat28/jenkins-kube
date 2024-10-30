@@ -39,12 +39,24 @@ pipeline{
       }
     }
 
-    stage('Deploy to Kubernetes') {
+    stage('Deploy') {
+            steps {
+                script {
+                    //kubernetesDeploy(configs: "yamls/deploy.yaml", kubeconfigId: "minikube")
+                    withKubeConfig([credentialsId: "mykubeconfig"]) {
+                        echo "Deploying applications to cluster"
+                        sh 'kubectl apply -f k8s-spring-boot-'
+                    }
+                }
+            }
+        }
+
+    /*stage('Deploy to Kubernetes') {
       steps {
         echo 'Deploying to Kubernetes'
         sh 'kubectl apply -f k8s-spring-boot-deployment.yml'
         
-        /*script {
+        script {
                     // Charger le fichier kubeconfig pour l'accès au cluster Kubernetes
             withKubeConfig([credentialsId: k8s-master-ssh	]) {
                         // Déployer l'application dans le cluster Kubernetes
