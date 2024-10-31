@@ -61,12 +61,16 @@ pipeline{
     stage('Remote') {
       steps {
         echo 'Connexion to remote'
-        script {
+        sshagent(['remote_credentials']) {
+        sh 'ssh -o StrictHostKeyChecking=no -t sandy@192.168.1.133 "sudo ls -lrt /root"'
+}
+
+        /*script {
           remote.user = env.SANDY_CREDENTIALS_USR
           remote.password = env.SANDY_CREDENTIALS_PSW
         }
         echo 'executing command in remote'
-        sshCommand remote: remote, command: "ls -lrt"
+        sshCommand remote: remote, command: "ls -lrt"*/
       }
     }
       
