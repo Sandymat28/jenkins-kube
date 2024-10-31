@@ -66,7 +66,7 @@ pipeline{
           remote.password = env.SANDY_CREDENTIALS_PSW
         }
         echo 'executing command in remote'
-        sshCommand remote: remote, command: "sudo ls -lrt"
+        sshCommand remote: remote, command: "ls -lrt"
       }
     }
       
