@@ -1,7 +1,7 @@
-def remote = [:]
+/*def remote = [:]
 remote.name = 'sandy'
 remote.host = '192.168.1.133'
-remote.allowAnyHosts = true
+remote.allowAnyHosts = true*/
     //remote.user = 'root'
     //remote.password = 'password'
 
@@ -9,10 +9,12 @@ pipeline{
   agent any
 
   environment{
-    DOCKERHUB_CREDENTIALS=credentials('DOCKER_ACCOUNT')
+    DOCKERHUB_CREDENTIALS = credentials('DOCKER_ACCOUNT')
     DOCKER_IMAGE = 'matsandy/example-kube:latest'
     DOCKER_TAG = 'latest'
     SANDY_CREDENTIALS = credentials('remote_credentials')
+      
+    HOSTNAME_DEPLOY_STAGING = '192.168.1.133'
   }
 
   stages{
@@ -57,20 +59,45 @@ pipeline{
           }
         }
       }
-
-    stage('Remote') {
+      
+    stage ('Deploy in staging') {
+      when {
+        expression { GIT_BRANCH == 'origin/main' }
+         }
+        steps {
+            sshagent(credentials: ['remote_credentials']) { 
+                sh '''
+                    [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
+                    ssh-keyscan -t rsa,dsa ${HOSTNAME_DEPLOY_STAGING} >> ~/.ssh/known_hosts
+                    scp -r deploy sandy@${HOSTNAME_DEPLOY_STAGING}:/home/sandy/
+                    command1="cd deploy && echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin"
+                    command2="echo 'IMAGE_VERSION=${DOCKERHUB_CREDENTIALS_USR}/${DOCKER_IMAGE}:${DOCKER_TAG}'"
+                    command3="docker compose down && docker pull ${DOCKERHUB_CREDENTIALS_USR}/${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    command4="docker compose up -d"
+                    ssh -t sandy@${HOSTNAME_DEPLOY_STAGING} \
+                      -o SendEnv=IMAGE_NAME \
+                      -o SendEnv=IMAGE_TAG \
+                      -o SendEnv=DOCKERHUB_CREDENTIALS_USR \
+                      -o SendEnv=DOCKERHUB_CREDENTIALS_PSW \
+                      -C "$command1 && $command2 && $command3 && $command4"
+                    '''
+                }
+            }
+        }
+      
+    /*stage('Remote') {
       steps {
         echo 'Connexion to remote'
         sshagent(['remote_credentials']) {
         sh 'ssh -o StrictHostKeyChecking=no -t sandy@192.168.1.133 "sudo ls -lrt /root"'
 }
 
-        /*script {
+        script {
           remote.user = env.SANDY_CREDENTIALS_USR
           remote.password = env.SANDY_CREDENTIALS_PSW
         }
         echo 'executing command in remote'
-        sshCommand remote: remote, command: "ls -lrt"*/
+        sshCommand remote: remote, command: "ls -lrt"
       }
     }
       
