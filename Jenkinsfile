@@ -69,7 +69,6 @@ pipeline{
                 sh '''
                     [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
                     ssh-keyscan -t rsa,dsa ${HOSTNAME_DEPLOY_STAGING} >> ~/.ssh/known_hosts
-                    scp -r deploy sandy@${HOSTNAME_DEPLOY_STAGING}:/home/sandy/
                     command1="cd deploy && echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin"
                     command2="echo 'IMAGE_VERSION=${DOCKERHUB_CREDENTIALS_USR}/${DOCKER_IMAGE}:${DOCKER_TAG}'"
                     command3="docker compose down && docker pull ${DOCKERHUB_CREDENTIALS_USR}/${DOCKER_IMAGE}:${DOCKER_TAG}"
