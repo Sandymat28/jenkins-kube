@@ -1,3 +1,14 @@
+def remote = [:]
+remote.name = 'sandy'
+remote.host = '192.168.1.133'
+remote.allowAnyHosts = true
+    //remote.user = 'root'
+    //remote.password = 'password'
+    
+    stage('Remote SSH') {
+      sshGet remote: remote, from: 'abc.sh', into: 'abc_get.sh', override: true
+    }
+
 pipeline{
   agent any
 
@@ -5,6 +16,7 @@ pipeline{
     DOCKERHUB_CREDENTIALS=credentials('DOCKER_ACCOUNT')
     DOCKER_IMAGE = 'matsandy/example-kube:latest'
     DOCKER_TAG = 'latest'
+    SANDY_CREDENTIALS = credentials('remote_credentials')
   }
 
   stages{
@@ -50,19 +62,31 @@ pipeline{
         }
       }
 
-    stage('Build') {
+    stage('Remote') {
+      steps {
+        script {
+          remote.user = env.SANDY_CREDENTIALS_USR
+          remote.password = env.SANDY_CREDENTIALS_PSW
+        }
+        sshCommand remote: remote, command: "ls -lrt"
+      }
+    }
+      
+
+    /*stage('Build') {
       steps {
         echo 'Building in remote device'
           sshagent(['remote_credentials']) {
             sh "ssh -o StrictHostKeyChecking=no -l sandy 192.168.1.133 'cd ~/public_html && ./bash_script.sh'"
             }
          }
-      }
+      }*/
    }
     
 post{
       always{
         sh 'docker logout'
+        sleep 5
       }
     }
 }
