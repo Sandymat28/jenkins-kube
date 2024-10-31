@@ -12,9 +12,9 @@ pipeline{
     DOCKERHUB_CREDENTIALS = credentials('DOCKER_ACCOUNT')
     DOCKER_IMAGE = 'matsandy/example-kube:latest'
     DOCKER_TAG = 'latest'
-    SANDY_CREDENTIALS = credentials('remote_credentials')
+    //SANDY_CREDENTIALS = credentials('remote_credentials')
       
-    HOSTNAME_DEPLOY_STAGING = '192.168.1.133'
+    HOSTNAME_DEPLOY = '192.168.1.133'
     DEPLOY_USER = 'sandy'
   }
 
@@ -132,7 +132,6 @@ pipeline{
 post{
       always{
         sh 'docker logout'
-        sleep 5
       }
     }
 }
