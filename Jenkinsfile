@@ -15,6 +15,7 @@ pipeline{
     SANDY_CREDENTIALS = credentials('remote_credentials')
       
     HOSTNAME_DEPLOY_STAGING = '192.168.1.133'
+    DEPLOY_USER = 'sandy'
   }
 
   stages{
@@ -61,14 +62,31 @@ pipeline{
       }
       
     stage ('Deploy in staging') {
-      when {
+        steps {
+                sshagent(credentials: ['remote_credentials']) {
+                    script {
+                        // Commandes pour déployer l'image Docker sur la machine distante
+                        sh """
+                        ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${HOSTNAME_DEPLOY} << EOF
+                          docker compose down || true
+                          docker pull ${DOCKERHUB_CREDENTIALS_USR}/${DOCKER_IMAGE}:${DOCKER_TAG}
+
+                          # Redémarrez les conteneurs avec la nouvelle image
+                          docker compose up -d
+                        EOF
+                        """
+                    }
+                }
+            }
+        }
+    /*  when {
         expression { GIT_BRANCH == 'origin/main' }
          }
         steps {
             sshagent(credentials: ['remote_credentials']) { 
                 sh '''
                     [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
-                    ssh-keyscan -t rsa,dsa ${HOSTNAME_DEPLOY_STAGING} >> ~/.ssh/known_hosts
+                    ssh-keyscan -t rsa ${HOSTNAME_DEPLOY_STAGING} >> ~/.ssh/known_hosts
                     command1="cd deploy && echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin"
                     command2="echo 'IMAGE_VERSION=${DOCKERHUB_CREDENTIALS_USR}/${DOCKER_IMAGE}:${DOCKER_TAG}'"
                     command3="docker compose down && docker pull ${DOCKERHUB_CREDENTIALS_USR}/${DOCKER_IMAGE}:${DOCKER_TAG}"
