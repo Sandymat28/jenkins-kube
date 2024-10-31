@@ -60,11 +60,13 @@ pipeline{
 
     stage('Remote') {
       steps {
+        echo 'Connexion to remote'
         script {
           remote.user = env.SANDY_CREDENTIALS_USR
           remote.password = env.SANDY_CREDENTIALS_PSW
         }
-        sshCommand remote: remote, command: "ls -lrt"
+        echo 'executing command in remote'
+        sshCommand remote: remote, command: "sudo ls -lrt"
       }
     }
       
