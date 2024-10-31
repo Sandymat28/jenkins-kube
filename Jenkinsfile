@@ -50,17 +50,15 @@ pipeline{
         }
       }
 
-    stages {
-        stage('Build') {
-          steps {
-            echo 'Building in remote device'
-            sshagent(['remote_credentials']) {
-                sh "ssh -o StrictHostKeyChecking=no -l sandy 192.168.1.133 'cd ~/public_html && ./bash_script.sh'"
+    stage('Build') {
+      steps {
+        echo 'Building in remote device'
+          sshagent(['remote_credentials']) {
+            sh "ssh -o StrictHostKeyChecking=no -l sandy 192.168.1.133 'cd ~/public_html && ./bash_script.sh'"
             }
          }
       }
    }
- }
     
 post{
       always{
