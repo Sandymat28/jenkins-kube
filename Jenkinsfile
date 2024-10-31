@@ -4,10 +4,6 @@ remote.host = '192.168.1.133'
 remote.allowAnyHosts = true
     //remote.user = 'root'
     //remote.password = 'password'
-    
-    stage('Remote SSH') {
-      sshGet remote: remote, from: 'abc.sh', into: 'abc_get.sh', override: true
-    }
 
 pipeline{
   agent any
